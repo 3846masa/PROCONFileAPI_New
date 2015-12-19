@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>YEHD 2015 Procon Status Search</title>
+
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.6/css/bootstrap-material-design.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.6/css/ripples.min.css">
+
+    <script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.6/js/material.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.6/js/ripples.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+    <script src="//cdn.rawgit.com/kflorence/jquery-deserialize/master/src/jquery.deserialize.js"></script>
+
+    <style>
+      nav.navbar {
+        margin-bottom: 0;
+      }
+      form#login {
+        margin: 5px 0 0 0;
+      }
+      .nav.nav-tabs > .active > a {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+      }
+      main.container {
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+      div.form-group {
+        margin: 0;
+      }
+      a.toggle-details,
+      a.toggle-details:hover,
+      a.toggle-details:active,
+      a.toggle-details:visited {
+        text-decoration: none;
+        color: inherit;
+      }
+
+      textarea {
+        resize: vertical;
+      }
+      select {
+        color: black;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">YEHD 2015 Procon Status Search</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container">
+      <div class="search">
+        <form id="searchForm">
+          ID: <input name="_id"/>
+          QuestionName: <input name="question"/>
+          Username: <input name="username"/>
+          <button class="btn btn-sm btn-info btn-raised">Search</button>
+        </form>
+      </div>
+      <table class="table" id="statusList">
+        <tr>
+          <th>ID</th>
+          <th>Status</th>
+          <th>Question</th>
+          <th>Lang</th>
+          <th>User</th>
+          <th>Submitted</th>
+        </tr>
+        <template>
+          <tr>
+            <th scope="row">{{_id}}</th>
+            <td>{{status}}</td>
+            <td>{{question}}</td>
+            <td>{{lang}}</td>
+            <td>{{username}}</td>
+            <td>{{submitted}}</td>
+          </tr>
+        </template>
+      </table>
+    </main>
+
+    <script> $.material.init(); </script>
+    <script src="./search.js"></script>
+  </body>
+</html>

@@ -1,4 +1,4 @@
-/* global $:false Handlebars:false marked:false */
+/* global $:false Handlebars:false marked:false MathJax:false */
 $.fn.serializeJson = function() {
   var obj = {};
   $.each(this.serializeArray(), function() {
@@ -16,7 +16,6 @@ $(function(){
   var userInfo = {};
 
   loadQuestionList()
-    .then(filterQuestionList)
     .then(formSettings)
     .then(loadUserInfo);
 
@@ -25,30 +24,13 @@ $(function(){
       .then(function(res) { return res.json(); })
       .then(function(json) {
         questionList = json.map(function(f) { return f.split('-'); })
-          .map(function(a) { return a.concat(a.splice(2).join('-')); })
+          .map(function(a) { return a.concat(a.splice(1).join('-')); })
           .map(function(a) { return {
-            category: a[0],
-            point: parseInt(a[1], 10),
-            name: a[2],
+            point: parseInt(a[0], 10),
+            name: a[1],
             question: a.join('-')
           }; });
         return questionList;
-      })
-      .then(function(list) {
-        var $category = $('#category');
-        var source = $('template', $category).html();
-        var template = Handlebars.compile(source);
-
-        var categoryList =
-          list.map(function(i) { return i.category; })
-            .filter(function (x, i, self) { return self.indexOf(x) === i; })
-            .sort();
-        categoryList.forEach(function(category) {
-          var $button = $(template({ category: category }));
-          $category.append($button);
-        });
-        $('a', $category).on('click', filterQuestionList);
-        return list;
       })
       .then(function(list) {
         var $qListContainer = $('main#qList');
@@ -62,40 +44,22 @@ $(function(){
       });
   }
 
-  function filterQuestionList(ev) {
-    var category = '';
-    if (!ev) category = location.hash.substr(1);
-    else category = ev.currentTarget.href.split('#')[1];
-    category = category.trim();
-
-    if (!category.match(/^[\w\d]+$/)) {
-      $('#qList .panel').show(500);
-      $('#category li').removeClass('active');
-      $('#category li[data-category="All"]').addClass('active');
-    } else {
-      $('#qList .panel[data-category="' + category + '"]').show(500);
-      $('#qList .panel[data-category!="' + category + '"]').hide(500);
-      $('#category li').removeClass('active');
-      $('#category li[data-category="' + category + '"]').addClass('active');
-    }
-  }
-
   function formSettings() {
     $('form').on('submit', function(ev) {
       ev.preventDefault();
     });
-    $('#qList .panel form').on('submit', submitFlag);
+    $('#qList .panel form').on('submit', submitCode);
     $('#login button').on('click', login);
     $('#logout button').on('click', logout);
   }
 
-  function submitFlag(ev) {
+  function submitCode(ev) {
     var $target = $(ev.currentTarget);
     var $parent = $target.parent();
     $('.alert', $parent).hide(250);
 
-    var flag = $('input', $target).val().trim();
-    $('input', $target).val('');
+    var code = $('textarea', $target).val();
+    var lang = $('select#lang').val();
 
     return fetch('./api/submit', {
       credentials: 'same-origin',
@@ -103,7 +67,8 @@ $(function(){
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         question: $target.data('question'),
-        flag: flag
+        code: code,
+        lang: lang
       })
     })
     .then(function(res) { return res.json(); })
@@ -111,7 +76,14 @@ $(function(){
       if (json.status !== 'ok') {
         $('.alert-warning', $parent).text(json.message).show(250);
       } else {
-        $('.alert-info', $parent).text(json.message || 'Success!!').show(250);
+        var message = $('<span>').text('Your submitID is ');
+        var id = $('<a>')
+          .attr({
+            href: '/search.html#_id=' + json.info._id,
+            target: '_blank'
+          })
+          .text(json.info._id);
+        $('.alert-info', $parent).empty().append(message).append(id).show(250);
       }
     })
     .then(loadUserInfo);
@@ -207,6 +179,16 @@ $(function(){
       fetch('/' + question + '/README.md')
         .then(function(res) { return res.text(); })
         .then(function(md) {
+          $details.html(md);
+          return new Promise(function(resolve) {
+            this.resolve = resolve;
+            MathJax.Hub.Queue(
+              ['Typeset', MathJax.Hub, $details[0]],
+              ['resolve', this]
+            );
+          });
+        })
+        .then(function() {
           var renderer = new marked.Renderer();
           (function() {
             var link = renderer.link.bind(renderer);
@@ -220,7 +202,9 @@ $(function(){
               return image(href, title, text);
             };
           })();
-          $details.html(marked(md + '\n\n----', { renderer: renderer }));
+          $details.html(marked($details.html() + '\n\n----', {
+            sanitize: false, renderer: renderer
+          }));
           $('a', $details).attr({ target: '_blank' });
         })
         .then(function() {
