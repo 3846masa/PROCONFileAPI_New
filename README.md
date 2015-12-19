@@ -1,5 +1,5 @@
-# CTFileAPI
-File-based CTF-Question Serving API.
+# PROCONFileAPI
+File-based Procon-Question Serving API.
 
 ## How to use
 - Clone project.
@@ -8,28 +8,30 @@ File-based CTF-Question Serving API.
 - Put questions folloing below.
   - ``questionList.json`` is JSON Array of folders.
     - If not exist, create dynamically
-  - Folder is ``{Category}-{Points}-{QuestionName}``
+  - Folder is ``{Points}-{QuestionName}``
   - ``README.md`` is description of question.
-  - ``flag.sha3-512`` is SHA3-512 Hash.
-  - Path in .md should be relateive path.
-  - ``README.md`` and ``flag.sha3-512`` are required.
+    - Path in .md should be relateive path.
+  - ``data/*.q`` is STDIN input data.
+  - ``data/*.ans`` is answer data.
+  - ``README.md`` are required.
 
 ```
 questions/
   |--- questionList.json
-  |--- Binary-100-Overflow
+  |--- 100-ProblemA
   |   |- README.md
-  |   |- flag.sha3-512
-  |   |- q.exe
-  |
-  |--- Misc-050-HelloWorld
-  |   |- README.md
-  |   |- flag.sha3-512
-  |   |- file.dat
-  |
-  |--- Web-500-JavaScript
+  |   |- data
+  |      |- 01.q
+  |      |- 02.q
+  |      |- 01.ans
+  |      |- 02.ans
+  |--- 050-ProblemB
       |- README.md
-      |- flag.sha3-512
+      |- data
+         |- 01.q
+         |- 02.q
+         |- 01.ans
+         |- 02.ans
 ```
 
 - Then, ``npm start``.
@@ -59,8 +61,9 @@ questions/
     ```json
     {
       "question": "Misc-100-Hello",
-      "flag":"FLAG{Hello,World}"
+      "lang": "perl",
+      "code": "print \"Hello,World!\\n\";"
     }
     ```
 - GET ``/{staticFilePath}``
-  - Example: ``/Misc-100-Hello/README.md``
+  - Example: ``/100-ProblemA/README.md``
