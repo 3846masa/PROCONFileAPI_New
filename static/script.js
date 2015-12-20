@@ -15,6 +15,11 @@ $(function(){
   var questionList = [];
   var userInfo = {};
 
+  $('#lang').on('change', function(ev) {
+    localStorage.setItem('lang', $(ev.currentTarget).val());
+  });
+  $('#lang').val(localStorage.getItem('lang'));
+
   loadQuestionList()
     .then(formSettings)
     .then(loadUserInfo);
