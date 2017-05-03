@@ -1,4 +1,6 @@
 # PROCONFileAPI
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/3846masa/YEHD-2015-ProconServer.svg)](https://greenkeeper.io/)
 File-based Procon-Question Serving API.
 
 ## How to use
